@@ -39,17 +39,22 @@ hist(test.custom.means(10, 0.25, 1, 0), xlab = "p-values", ylab = "Frequency", m
 hist(test.custom.means(10, 0.25, 1, 1), xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Poisson dist - diff means)")
 hist(test.custom.means(1000, 0.05, 1, 1), xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Poisson dist - diff means & larger sample)")
 
-# Task 4
+# Task 4, 8
+rpowers.normal <- c()
+rpowers.poisson <- c()
 tpowers <- c()
-rpowers <- c()
 delta.list <- seq(0, 2, 0.01)
 for (d in delta.list) {
-  pvalues <- replicate(1000, t.test(rnorm(10, -d/2), rnorm(10, d/2))$p.value)
+  pvalues.normal <- replicate(1000, t.test(rnorm(10, -d/2), rnorm(10, d/2))$p.value)
+  pvalues.poisson <- replicate(1000, t.test(rpois(10,1) - d/2, rpois(10, 1) + d/2)$p.value)
   tpowers <- append(tpowers, power.t.test(10, delta = d)$power)
-  rpowers <- append(rpowers, sum(pvalues < 0.05) / 1000)
+  rpowers.normal <- append(rpowers.normal, sum(pvalues.normal < 0.05) / 1000)
+  rpowers.poisson <- append(rpowers.poisson, sum(pvalues.poisson < 0.05) / 1000)
 }
-plot(delta.list, rpowers, type = "l", col = "blue")
-lines(delta.list, tpowers, col = "red")
+plot(delta.list, tpowers, type = "l", col = "blue", xlab = "delta", ylab = "Power", main = "Power comparison between t-tests on different distributions")
+lines(delta.list, rpowers.poisson, col = "green")
+lines(delta.list, rpowers.normal, col = "red")
+legend(x = "topleft", legend = c("Theoretical", "Poisson", "Normal"), cex = 0.8, lty = c(1, 1, 1), col = c("blue", "green", "red"), bty = "n")
 
 # Task 5
 for (sample.size in c(10, 100, 1000)) {
