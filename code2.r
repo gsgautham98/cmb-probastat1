@@ -1,4 +1,4 @@
-# Task 1, 8
+# Task 1, 8, 9
 s <- rnorm(10)
 t <- rnorm(10)
 print(t.test(s, t))
@@ -7,24 +7,37 @@ p <- rpois(10, 1)
 q <- rpois(10, 1)
 print(t.test(p, q))
 
-# Task 2, 8
+p.large <- rpois(1000, 1)
+q.large <- rpois(1000, 1)
+print(t.test(p.large, q.large))
+
+# Task 2, 8, 9
 results.normal <- replicate(10000, t.test(rnorm(10), rnorm(10))$p.value)
 results.poisson <- replicate(10000, t.test(rpois(10, 1), rpois(10, 1))$p.value)
-hist(results.normal, xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Normal distribution equal means t-test)")
-hist(results.poisson, xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Poisson distribution equal means t-test)")
+results.poisson.large <- replicate(10000, t.test(rpois(1000, 1), rpois(1000, 1))$p.value)
+hist(results.normal, xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Normal distribution)")
+hist(results.poisson, xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Poisson distribution)")
+hist(results.poisson.large, xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Poisson distribution - large sample)")
 
-# Task 3
-test.custom.means <- function(x, v) {
+# Task 3, 8, 9
+test.custom.means <- function(n, x, v, f) {
   pvalues <- c()
-  for (i in 1:10000) {
-    s <- rnorm(10, x, v)
-    t <- rnorm(10, -x, v)
+  for (i in 1:1000) {
+    if (f == 0) {
+      s <- rnorm(n, -x, v)
+      t <- rnorm(n, x, v)
+    }
+    else {
+      s <- rpois(n, 1) - x
+      t <- rpois(n, 1) + x
+    }
     pvalues <- append(pvalues, t.test(s, t)$p.value)
   }
   return(pvalues)
 }
-
-hist(test.custom.means(0.35, 1), xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (different means t-test)")
+hist(test.custom.means(10, 0.25, 1, 0), xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Normal dist - diff means)")
+hist(test.custom.means(10, 0.25, 1, 1), xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Poisson dist - diff means)")
+hist(test.custom.means(1000, 0.05, 1, 1), xlab = "p-values", ylab = "Frequency", main = "Histogram of p-values (Poisson dist - diff means & larger sample)")
 
 # Task 4
 tpowers <- c()
