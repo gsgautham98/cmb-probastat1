@@ -75,3 +75,19 @@ for (sample.size in c(10, 100, 1000)) {
   plot(delta.list, v.equal.power, type = "l", col = "blue", main = paste0("Plot with sample size ", sample.size))
   points(delta.list, v.unequal.power, col = "red", pch = 20, cex = 0.5)
 }
+
+# Task 6
+v.seq <- seq(0.05, 4, 0.05)
+f.pos.eq.list <- c()
+f.pos.uneq.list <- c()
+for (v in v.seq) {
+  f.pos.equal <- replicate(1000, t.test(rnorm(100, 0, 0.5), rnorm(100, 0, v), var.equal = TRUE)$p.value) < 0.05
+  f.pos.unequal <- replicate(1000, t.test(rnorm(100, 0, 0.5), rnorm(100, 0, v))$p.value) < 0.05
+  f.pos.eq.list <- append(f.pos.eq.list, mean(f.pos.equal))
+  f.pos.uneq.list <- append(f.pos.uneq.list, mean(f.pos.unequal))
+}
+f.pos.eq.rate <- f.pos.eq.list / seq_along(v.seq)
+f.pos.uneq.rate <- f.pos.uneq.list / seq_along(v.seq)
+plot(v.seq, f.pos.eq.rate, type = "l", col = "blue", xlab = "Variance", ylab = "False positive rate", main = "Evolution of false positive rate for a normally-distributed sample")
+lines(v.seq, f.pos.uneq.rate, col = "red")
+legend(x = "topright", c("Equal variances t-test", "Unequal variances t-test"), cex = 0.8, lty = c(1, 1), col = c("blue", "red"), bty = "n")
